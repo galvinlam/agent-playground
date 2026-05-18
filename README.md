@@ -6,7 +6,11 @@
   </a>
 </p>
 
-Agent Playground is a small static browser project for a college portfolio. It presents autonomous agent ideas as a playful simulation: tiny agents move around a sandbox, choose behaviors, react to resources and hazards, and leave a readable timeline of what they are doing.
+Agent Playground started from a simple question: what makes a bot look like it is thinking?
+
+Instead of building another chat interface, this experiment turns that question into a small visual sandbox. Tiny agents move around a shared board, react to resources and hazards, choose behaviors, and leave behind a readable trail of decisions. The point is not to make the smartest possible agent. The point is to make the decision loop visible.
+
+Each agent has limited energy, a goal, and a simple personality. Sometimes it explores. Sometimes it gathers. Sometimes it follows another agent, trades, competes, recharges, or flees. Small rule changes can make the group feel calm, greedy, cooperative, or chaotic.
 
 ![Agent Playground screenshot](docs/assets/agent-playground-main.png)
 
@@ -34,6 +38,6 @@ Then visit `http://localhost:8000`.
 
 ## Why It Exists
 
-This project is meant to make autonomous agent experimentation feel approachable. Instead of presenting AI agents as a dense research topic, it shows the core idea visually: agents observe a changing environment, make simple decisions, adapt their behavior, and sometimes work together or compete.
+Autonomous agents can sound abstract when they are described only in terms of prompts, tools, and planning loops. This project makes the idea easier to see. An agent observes its surroundings, updates its internal state, chooses an action, and affects the world around it.
 
-It is intentionally lightweight, static, and easy to screenshot for a portfolio review.
+The sandbox is intentionally lightweight. It is a place to experiment with behavior, not a full game engine or a serious simulation. The interesting part is watching simple decision rules combine into something that starts to feel alive.
