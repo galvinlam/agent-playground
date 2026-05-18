@@ -1,0 +1,1069 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent Playground</title>
+  <meta name="description" content="A playful autonomous-agent sandbox for portfolio demos.">
+  <style>
+    :root {
+      --bg: #09110f;
+      --panel: rgba(16, 30, 27, 0.82);
+      --panel-strong: rgba(20, 42, 37, 0.95);
+      --paper: #f7f0d2;
+      --ink: #f7f4df;
+      --muted: #aebcad;
+      --line: rgba(215, 229, 192, 0.18);
+      --amber: #f7c95f;
+      --mint: #7ef0b2;
+      --aqua: #59c7e8;
+      --coral: #ff796b;
+      --violet: #bda4ff;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+      --radius: 28px;
+      color-scheme: dark;
+      font-family: "Trebuchet MS", "Avenir Next", Verdana, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 10%, rgba(126, 240, 178, 0.23), transparent 30%),
+        radial-gradient(circle at 86% 12%, rgba(247, 201, 95, 0.22), transparent 28%),
+        linear-gradient(135deg, #07100e 0%, #11231f 48%, #201b14 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: radial-gradient(circle at center, black, transparent 78%);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .shell {
+      position: relative;
+      width: min(1480px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 26px 0 34px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      max-width: 900px;
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(3rem, 7vw, 7.8rem);
+      line-height: 0.9;
+      letter-spacing: -0.075em;
+      text-wrap: balance;
+    }
+
+    .intro {
+      max-width: 720px;
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.6vw, 1.22rem);
+      line-height: 1.6;
+    }
+
+    .status-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(120px, 1fr));
+      gap: 10px;
+      min-width: min(470px, 100%);
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(9, 17, 15, 0.66);
+      box-shadow: var(--shadow);
+    }
+
+    .metric {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(247, 240, 210, 0.08);
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.72rem;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 8px;
+      color: var(--paper);
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: 290px minmax(0, 1fr) 350px;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(20px);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(247, 240, 210, 0.08), transparent);
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 0.82rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .controls {
+      display: grid;
+      gap: 18px;
+      padding: 18px;
+    }
+
+    .button-row,
+    .scenario-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .button-row {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .btn {
+      min-height: 44px;
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      color: var(--ink);
+      background: rgba(247, 240, 210, 0.09);
+      cursor: pointer;
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    .btn:hover,
+    .btn:focus-visible {
+      transform: translateY(-1px);
+      border-color: rgba(126, 240, 178, 0.55);
+      outline: none;
+      background: rgba(126, 240, 178, 0.13);
+    }
+
+    .btn.primary {
+      color: #10211c;
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--mint), var(--amber));
+      font-weight: 800;
+    }
+
+    .scenario-grid .btn {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-align: left;
+    }
+
+    .scenario-grid .btn.active {
+      border-color: rgba(247, 201, 95, 0.8);
+      background: rgba(247, 201, 95, 0.16);
+    }
+
+    .slider-group {
+      display: grid;
+      gap: 14px;
+    }
+
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 9px;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--mint);
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(247, 240, 210, 0.06);
+      color: var(--muted);
+    }
+
+    .switch {
+      position: relative;
+      width: 52px;
+      height: 28px;
+      flex: 0 0 auto;
+    }
+
+    .switch input {
+      position: absolute;
+      opacity: 0;
+    }
+
+    .track {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: rgba(247, 240, 210, 0.18);
+      transition: background 160ms ease;
+    }
+
+    .track::after {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      top: 3px;
+      left: 3px;
+      border-radius: 50%;
+      background: var(--paper);
+      transition: transform 160ms ease;
+    }
+
+    .switch input:checked + .track {
+      background: rgba(126, 240, 178, 0.62);
+    }
+
+    .switch input:checked + .track::after {
+      transform: translateX(24px);
+    }
+
+    .sim-wrap {
+      display: grid;
+      grid-template-rows: auto minmax(430px, 1fr) auto;
+      min-height: 710px;
+    }
+
+    .canvas-frame {
+      position: relative;
+      margin: 18px;
+      border: 1px solid rgba(247, 240, 210, 0.26);
+      border-radius: 30px;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(126, 240, 178, 0.22), transparent 22%),
+        radial-gradient(circle at 82% 25%, rgba(255, 121, 107, 0.18), transparent 18%),
+        radial-gradient(circle at 60% 78%, rgba(89, 199, 232, 0.16), transparent 20%),
+        #0b1815;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 430px;
+    }
+
+    .board-caption {
+      position: absolute;
+      left: 18px;
+      bottom: 18px;
+      max-width: min(520px, calc(100% - 36px));
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(7, 16, 14, 0.78);
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 18px 18px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(247, 240, 210, 0.06);
+      font-size: 0.8rem;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .right-column {
+      display: grid;
+      grid-template-rows: 1fr 320px;
+      gap: 18px;
+      min-height: 710px;
+    }
+
+    .agents {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+      max-height: 370px;
+      overflow: auto;
+    }
+
+    .agent-card {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(247, 240, 210, 0.07);
+    }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      color: #07100e;
+      font-weight: 900;
+    }
+
+    .agent-card h3 {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 0 0 7px;
+      font-size: 1rem;
+    }
+
+    .behavior {
+      color: var(--amber);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .mini-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .bar {
+      grid-column: 1 / -1;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(247, 240, 210, 0.12);
+      overflow: hidden;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--coral), var(--amber), var(--mint));
+    }
+
+    .log {
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 9px;
+      height: 262px;
+      padding: 15px;
+      overflow: auto;
+    }
+
+    .log-entry {
+      padding: 11px 12px;
+      border-left: 3px solid var(--aqua);
+      border-radius: 12px;
+      background: rgba(247, 240, 210, 0.065);
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.35;
+    }
+
+    .log-entry strong {
+      color: var(--ink);
+    }
+
+    .footer-note {
+      margin: 20px auto 0;
+      max-width: 880px;
+      color: rgba(247, 244, 223, 0.68);
+      font-size: 0.92rem;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    @media (max-width: 1180px) {
+      .hero,
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+
+      .right-column {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto;
+        min-height: 0;
+      }
+
+      .sim-wrap {
+        min-height: 620px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .shell {
+        width: min(100% - 22px, 1480px);
+        padding-top: 16px;
+      }
+
+      .status-strip,
+      .right-column {
+        grid-template-columns: 1fr;
+      }
+
+      .button-row {
+        grid-template-columns: 1fr;
+      }
+
+      .sim-wrap {
+        min-height: 560px;
+      }
+
+      .canvas-frame {
+        margin: 12px;
+      }
+
+      canvas {
+        min-height: 380px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <h1 id="page-title">Agent Playground</h1>
+        <p class="intro">A visual sandbox where tiny autonomous agents try different strategies, react to changing conditions, and leave a readable trail of decisions.</p>
+      </div>
+      <div class="status-strip" aria-label="Simulation metrics">
+        <div class="metric"><span>Mode</span><strong id="modeMetric">Running</strong></div>
+        <div class="metric"><span>Step</span><strong id="stepMetric">0</strong></div>
+        <div class="metric"><span>Scenario</span><strong id="scenarioMetric">Harvest</strong></div>
+      </div>
+    </section>
+
+    <section class="dashboard" aria-label="Agent simulation controls and output">
+      <aside class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Control Room</h2>
+          <span class="hint">demo knobs</span>
+        </div>
+        <div class="controls">
+          <div class="button-row">
+            <button class="btn primary" id="toggleRun" type="button">Pause</button>
+            <button class="btn" id="reset" type="button">Reset</button>
+          </div>
+
+          <div>
+            <h3 class="panel-title">Scenarios</h3>
+            <div class="scenario-grid" id="scenarioButtons">
+              <button class="btn active" type="button" data-scenario="harvest">Resource Rush <span>gather</span></button>
+              <button class="btn" type="button" data-scenario="market">Trade Bazaar <span>trade</span></button>
+              <button class="btn" type="button" data-scenario="storm">Energy Storm <span>flee</span></button>
+              <button class="btn" type="button" data-scenario="team">Co-op Quest <span>cooperate</span></button>
+            </div>
+          </div>
+
+          <div class="slider-group" aria-label="Strategy sliders">
+            <label>
+              <span class="slider-label"><span>Curiosity</span><strong id="curiosityValue">68</strong></span>
+              <input id="curiosity" type="range" min="0" max="100" value="68">
+            </label>
+            <label>
+              <span class="slider-label"><span>Risk Appetite</span><strong id="riskValue">42</strong></span>
+              <input id="risk" type="range" min="0" max="100" value="42">
+            </label>
+            <label>
+              <span class="slider-label"><span>Team Bias</span><strong id="teamValue">55</strong></span>
+              <input id="teamBias" type="range" min="0" max="100" value="55">
+            </label>
+          </div>
+
+          <label class="toggle">
+            <span>Show intent trails</span>
+            <span class="switch">
+              <input id="trails" type="checkbox" checked>
+              <span class="track"></span>
+            </span>
+          </label>
+          <label class="toggle">
+            <span>Competitive scoring</span>
+            <span class="switch">
+              <input id="competition" type="checkbox" checked>
+              <span class="track"></span>
+            </span>
+          </label>
+        </div>
+      </aside>
+
+      <section class="panel sim-wrap">
+        <div class="panel-header">
+          <h2 class="panel-title">Sandbox Board</h2>
+          <span class="hint" id="boardHint">Agents are choosing actions every few seconds.</span>
+        </div>
+        <div class="canvas-frame">
+          <canvas id="board" width="980" height="620" aria-label="Animated simulation board"></canvas>
+          <p class="board-caption" id="caption">Each agent scores nearby resources, other agents, hazards, and energy level. The highest-scoring behavior becomes the next move.</p>
+        </div>
+        <div class="legend" aria-label="Board legend">
+          <span class="legend-item"><span class="dot" style="background: var(--mint)"></span>Resources</span>
+          <span class="legend-item"><span class="dot" style="background: var(--coral)"></span>Hazards</span>
+          <span class="legend-item"><span class="dot" style="background: var(--amber)"></span>Recharge pads</span>
+          <span class="legend-item"><span class="dot" style="background: var(--aqua)"></span>Agent path</span>
+        </div>
+      </section>
+
+      <aside class="right-column">
+        <section class="panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Agent Cards</h2>
+            <span class="hint">live status</span>
+          </div>
+          <div class="agents" id="agentCards"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Behavior Timeline</h2>
+            <span class="hint">plain-English log</span>
+          </div>
+          <div class="log" id="log"></div>
+        </section>
+      </aside>
+    </section>
+
+    <p class="footer-note">Built as a static portfolio experiment: simple enough to understand at a glance, interactive enough to show how autonomous behavior can emerge from local rules.</p>
+  </main>
+
+  <script>
+    const canvas = document.querySelector("#board");
+    const ctx = canvas.getContext("2d");
+    const cards = document.querySelector("#agentCards");
+    const logEl = document.querySelector("#log");
+    const toggleRun = document.querySelector("#toggleRun");
+    const resetBtn = document.querySelector("#reset");
+    const scenarioMetric = document.querySelector("#scenarioMetric");
+    const modeMetric = document.querySelector("#modeMetric");
+    const stepMetric = document.querySelector("#stepMetric");
+    const caption = document.querySelector("#caption");
+    const scenarioButtons = document.querySelector("#scenarioButtons");
+    const trailsToggle = document.querySelector("#trails");
+    const competitionToggle = document.querySelector("#competition");
+    const sliders = {
+      curiosity: document.querySelector("#curiosity"),
+      risk: document.querySelector("#risk"),
+      teamBias: document.querySelector("#teamBias")
+    };
+    const sliderOutputs = {
+      curiosity: document.querySelector("#curiosityValue"),
+      risk: document.querySelector("#riskValue"),
+      teamBias: document.querySelector("#teamValue")
+    };
+
+    const scenarioCopy = {
+      harvest: {
+        label: "Harvest",
+        caption: "Resources are plentiful. Agents mostly gather, explore, and occasionally compete over the richest clusters."
+      },
+      market: {
+        label: "Market",
+        caption: "Trade beacons are more valuable. Agents look for partners, swap points, and follow high-performing neighbors."
+      },
+      storm: {
+        label: "Storm",
+        caption: "Hazards drift through the sandbox. Agents with low risk tolerance flee sooner and recharge more often."
+      },
+      team: {
+        label: "Co-op",
+        caption: "Team rewards are boosted. Agents score cooperation higher when a nearby partner is chasing the same goal."
+      }
+    };
+
+    const behaviorColors = {
+      gather: "#7ef0b2",
+      explore: "#59c7e8",
+      trade: "#f7c95f",
+      follow: "#bda4ff",
+      flee: "#ff796b",
+      recharge: "#ffeaa0",
+      cooperate: "#8ff7df",
+      compete: "#ff9f74"
+    };
+
+    const names = ["Milo", "Nova", "Pip", "Jun", "Echo", "Zed"];
+    const colors = ["#7ef0b2", "#59c7e8", "#f7c95f", "#ff796b", "#bda4ff", "#8ff7df"];
+    let agents = [];
+    let resources = [];
+    let hazards = [];
+    let pads = [];
+    let running = true;
+    let scenario = "harvest";
+    let step = 0;
+    let lastDecisionAt = 0;
+    let lastFrameAt = performance.now();
+
+    function rand(min, max) {
+      return min + Math.random() * (max - min);
+    }
+
+    function distance(a, b) {
+      return Math.hypot(a.x - b.x, a.y - b.y);
+    }
+
+    function nearest(origin, list) {
+      return list.reduce((best, item) => {
+        const d = distance(origin, item);
+        return d < best.d ? { item, d } : best;
+      }, { item: null, d: Infinity });
+    }
+
+    function createAgents() {
+      agents = names.map((name, index) => ({
+        name,
+        x: rand(80, canvas.width - 80),
+        y: rand(80, canvas.height - 80),
+        vx: rand(-0.35, 0.35),
+        vy: rand(-0.35, 0.35),
+        color: colors[index],
+        behavior: "explore",
+        energy: rand(62, 96),
+        score: 0,
+        mood: "curious",
+        target: null,
+        trail: []
+      }));
+    }
+
+    function createWorld() {
+      const resourceCount = scenario === "harvest" ? 28 : scenario === "storm" ? 14 : 20;
+      const hazardCount = scenario === "storm" ? 9 : 5;
+      resources = Array.from({ length: resourceCount }, () => ({
+        x: rand(40, canvas.width - 40),
+        y: rand(40, canvas.height - 40),
+        value: rand(6, 18)
+      }));
+      hazards = Array.from({ length: hazardCount }, () => ({
+        x: rand(60, canvas.width - 60),
+        y: rand(60, canvas.height - 60),
+        r: rand(18, 34),
+        drift: rand(0.2, 0.7)
+      }));
+      pads = Array.from({ length: 4 }, () => ({
+        x: rand(70, canvas.width - 70),
+        y: rand(70, canvas.height - 70)
+      }));
+    }
+
+    function log(message) {
+      const entry = document.createElement("div");
+      entry.className = "log-entry";
+      entry.innerHTML = message;
+      logEl.prepend(entry);
+      while (logEl.children.length > 18) {
+        logEl.lastElementChild.remove();
+      }
+    }
+
+    function reset() {
+      step = 0;
+      logEl.innerHTML = "";
+      createAgents();
+      createWorld();
+      log("<strong>Reset:</strong> new sandbox seeded with fresh resources, hazards, and starting positions.");
+      renderCards();
+    }
+
+    function weights() {
+      return {
+        curiosity: Number(sliders.curiosity.value) / 100,
+        risk: Number(sliders.risk.value) / 100,
+        team: Number(sliders.teamBias.value) / 100
+      };
+    }
+
+    function chooseBehavior(agent) {
+      const w = weights();
+      const closestResource = nearest(agent, resources);
+      const closestHazard = nearest(agent, hazards);
+      const closestPad = nearest(agent, pads);
+      const closestAgent = nearest(agent, agents.filter((other) => other !== agent));
+      const lowEnergy = Math.max(0, 1 - agent.energy / 58);
+      const danger = closestHazard.d < 120 ? (120 - closestHazard.d) / 120 : 0;
+      const scarcity = resources.length < 12 ? 0.32 : 0;
+
+      const scores = {
+        gather: (closestResource.item ? 1 - Math.min(closestResource.d, 360) / 360 : 0) + (scenario === "harvest" ? 0.28 : 0),
+        explore: w.curiosity + Math.random() * 0.18,
+        trade: scenario === "market" ? 0.85 : 0.18 + (agent.score > 25 ? 0.16 : 0),
+        follow: closestAgent.d < 180 ? 0.35 + w.team * 0.45 : 0.14,
+        flee: danger * (1.15 - w.risk) + (scenario === "storm" ? 0.18 : 0),
+        recharge: lowEnergy + (closestPad.d < 140 ? 0.22 : 0),
+        cooperate: w.team + (scenario === "team" ? 0.42 : 0) + (closestAgent.d < 170 ? 0.2 : 0),
+        compete: competitionToggle.checked ? w.risk + scarcity + (scenario === "harvest" ? 0.16 : 0) : 0
+      };
+
+      const behavior = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
+      if (behavior !== agent.behavior) {
+        log(`<strong>${agent.name}</strong> switched from ${agent.behavior} to <strong>${behavior}</strong> after comparing energy, nearby objects, and scenario pressure.`);
+      }
+      agent.behavior = behavior;
+      agent.mood = behavior === "flee" ? "alert" : behavior === "recharge" ? "tired" : behavior === "cooperate" ? "helpful" : behavior === "compete" ? "bold" : "curious";
+
+      if (behavior === "gather" || behavior === "compete") agent.target = closestResource.item;
+      else if (behavior === "recharge") agent.target = closestPad.item;
+      else if (behavior === "follow" || behavior === "trade" || behavior === "cooperate") agent.target = closestAgent.item;
+      else if (behavior === "flee") agent.target = closestHazard.item;
+      else agent.target = { x: rand(40, canvas.width - 40), y: rand(40, canvas.height - 40) };
+    }
+
+    function steer(agent, dt) {
+      const speedByBehavior = {
+        gather: 0.18,
+        explore: 0.13,
+        trade: 0.15,
+        follow: 0.17,
+        flee: 0.28,
+        recharge: 0.16,
+        cooperate: 0.16,
+        compete: 0.23
+      };
+      const speed = speedByBehavior[agent.behavior] || 0.15;
+      let tx = agent.target?.x ?? agent.x;
+      let ty = agent.target?.y ?? agent.y;
+
+      if (agent.behavior === "flee" && agent.target) {
+        tx = agent.x + (agent.x - agent.target.x);
+        ty = agent.y + (agent.y - agent.target.y);
+      }
+
+      const angle = Math.atan2(ty - agent.y, tx - agent.x);
+      agent.vx += Math.cos(angle) * speed * dt;
+      agent.vy += Math.sin(angle) * speed * dt;
+      agent.vx *= 0.9;
+      agent.vy *= 0.9;
+      agent.x += agent.vx;
+      agent.y += agent.vy;
+
+      if (agent.x < 20 || agent.x > canvas.width - 20) agent.vx *= -1;
+      if (agent.y < 20 || agent.y > canvas.height - 20) agent.vy *= -1;
+      agent.x = Math.max(20, Math.min(canvas.width - 20, agent.x));
+      agent.y = Math.max(20, Math.min(canvas.height - 20, agent.y));
+      agent.energy = Math.max(0, Math.min(100, agent.energy - (agent.behavior === "flee" || agent.behavior === "compete" ? 0.035 : 0.018) * dt));
+
+      agent.trail.push({ x: agent.x, y: agent.y });
+      if (agent.trail.length > 42) agent.trail.shift();
+    }
+
+    function resolveInteractions(agent) {
+      resources = resources.filter((resource) => {
+        if (distance(agent, resource) < 20 && ["gather", "compete"].includes(agent.behavior)) {
+          agent.score += Math.round(resource.value * (agent.behavior === "compete" ? 1.2 : 1));
+          agent.energy = Math.min(100, agent.energy + 6);
+          log(`<strong>${agent.name}</strong> collected a resource while trying to ${agent.behavior}.`);
+          return false;
+        }
+        return true;
+      });
+
+      pads.forEach((pad) => {
+        if (distance(agent, pad) < 28 && agent.behavior === "recharge") {
+          agent.energy = Math.min(100, agent.energy + 1.2);
+        }
+      });
+
+      hazards.forEach((hazard) => {
+        if (distance(agent, hazard) < hazard.r + 9) {
+          agent.energy = Math.max(0, agent.energy - 1.3);
+          if (agent.behavior !== "flee") {
+            agent.behavior = "flee";
+            agent.target = hazard;
+            log(`<strong>${agent.name}</strong> bumped into a hazard and immediately changed to <strong>flee</strong>.`);
+          }
+        }
+      });
+
+      agents.forEach((other) => {
+        if (other === agent || distance(agent, other) > 26) return;
+        if (agent.behavior === "cooperate") {
+          agent.score += 0.08;
+          other.score += 0.04;
+        }
+        if (agent.behavior === "trade") {
+          agent.energy = Math.min(100, agent.energy + 0.18);
+          other.energy = Math.min(100, other.energy + 0.08);
+        }
+      });
+
+      if (resources.length < 8) {
+        resources.push({ x: rand(40, canvas.width - 40), y: rand(40, canvas.height - 40), value: rand(6, 18) });
+      }
+    }
+
+    function updateWorld(dt) {
+      hazards.forEach((hazard, index) => {
+        hazard.x += Math.cos(step / 22 + index) * hazard.drift * dt * 0.08;
+        hazard.y += Math.sin(step / 25 + index * 2) * hazard.drift * dt * 0.08;
+        hazard.x = Math.max(35, Math.min(canvas.width - 35, hazard.x));
+        hazard.y = Math.max(35, Math.min(canvas.height - 35, hazard.y));
+      });
+    }
+
+    function drawGrid() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      ctx.globalAlpha = 0.26;
+      ctx.strokeStyle = "rgba(247,240,210,0.13)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x <= canvas.width; x += 48) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+      for (let y = 0; y <= canvas.height; y += 48) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function draw() {
+      drawGrid();
+
+      resources.forEach((resource) => {
+        ctx.fillStyle = "#7ef0b2";
+        ctx.beginPath();
+        ctx.arc(resource.x, resource.y, 5 + resource.value / 5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      pads.forEach((pad) => {
+        ctx.strokeStyle = "#f7c95f";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(pad.x, pad.y, 22, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.fillStyle = "rgba(247,201,95,0.16)";
+        ctx.fill();
+      });
+
+      hazards.forEach((hazard) => {
+        ctx.fillStyle = "rgba(255,121,107,0.16)";
+        ctx.strokeStyle = "#ff796b";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(hazard.x, hazard.y, hazard.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      });
+
+      agents.forEach((agent) => {
+        if (trailsToggle.checked) {
+          ctx.strokeStyle = behaviorColors[agent.behavior] + "88";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          agent.trail.forEach((point, index) => {
+            if (index === 0) ctx.moveTo(point.x, point.y);
+            else ctx.lineTo(point.x, point.y);
+          });
+          ctx.stroke();
+        }
+
+        if (agent.target) {
+          ctx.strokeStyle = behaviorColors[agent.behavior] + "55";
+          ctx.setLineDash([5, 9]);
+          ctx.beginPath();
+          ctx.moveTo(agent.x, agent.y);
+          ctx.lineTo(agent.target.x, agent.target.y);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+
+        ctx.fillStyle = agent.color;
+        ctx.shadowColor = agent.color;
+        ctx.shadowBlur = 16;
+        ctx.beginPath();
+        ctx.arc(agent.x, agent.y, 13, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = "#07100e";
+        ctx.font = "900 10px Trebuchet MS";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(agent.name[0], agent.x, agent.y + 1);
+        ctx.fillStyle = behaviorColors[agent.behavior];
+        ctx.font = "700 11px Trebuchet MS";
+        ctx.fillText(agent.behavior, agent.x, agent.y - 22);
+      });
+    }
+
+    function renderCards() {
+      cards.innerHTML = agents.map((agent) => `
+        <article class="agent-card">
+          <div class="avatar" style="background:${agent.color}">${agent.name[0]}</div>
+          <div>
+            <h3>${agent.name}<span class="behavior">${agent.behavior}</span></h3>
+            <div class="mini-stats">
+              <span>Energy ${Math.round(agent.energy)}%</span>
+              <span>Score ${Math.floor(agent.score)}</span>
+              <span>Mood ${agent.mood}</span>
+              <span>Goal ${agent.target ? "locked" : "scanning"}</span>
+              <span class="bar"><span style="width:${Math.round(agent.energy)}%"></span></span>
+            </div>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function tick(now) {
+      const dt = Math.min(40, now - lastFrameAt);
+      lastFrameAt = now;
+
+      if (running) {
+        step += 1;
+        updateWorld(dt);
+        if (now - lastDecisionAt > 1450) {
+          agents.forEach(chooseBehavior);
+          lastDecisionAt = now;
+          renderCards();
+        }
+        agents.forEach((agent) => {
+          steer(agent, dt);
+          resolveInteractions(agent);
+        });
+        stepMetric.textContent = String(Math.floor(step / 10));
+        if (step % 16 === 0) renderCards();
+      }
+
+      draw();
+      requestAnimationFrame(tick);
+    }
+
+    toggleRun.addEventListener("click", () => {
+      running = !running;
+      toggleRun.textContent = running ? "Pause" : "Start";
+      modeMetric.textContent = running ? "Running" : "Paused";
+      log(running ? "<strong>Started:</strong> agents resumed choosing and moving." : "<strong>Paused:</strong> current behavior state is frozen for inspection.");
+    });
+
+    resetBtn.addEventListener("click", reset);
+
+    scenarioButtons.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-scenario]");
+      if (!button) return;
+      scenario = button.dataset.scenario;
+      document.querySelectorAll("[data-scenario]").forEach((item) => item.classList.toggle("active", item === button));
+      scenarioMetric.textContent = scenarioCopy[scenario].label;
+      caption.textContent = scenarioCopy[scenario].caption;
+      createWorld();
+      agents.forEach(chooseBehavior);
+      renderCards();
+      log(`<strong>Scenario:</strong> switched to ${scenarioCopy[scenario].label}. Agent priorities were recalculated.`);
+    });
+
+    Object.entries(sliders).forEach(([key, input]) => {
+      input.addEventListener("input", () => {
+        sliderOutputs[key].textContent = input.value;
+        agents.forEach(chooseBehavior);
+        renderCards();
+      });
+    });
+
+    competitionToggle.addEventListener("change", () => {
+      agents.forEach(chooseBehavior);
+      log(`<strong>Competition:</strong> scoring is now ${competitionToggle.checked ? "enabled" : "softened"} for agent decisions.`);
+    });
+
+    reset();
+    caption.textContent = scenarioCopy[scenario].caption;
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>
