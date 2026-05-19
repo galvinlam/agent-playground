@@ -3,26 +3,26 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Agent Playground</title>
-  <meta name="description" content="A playful autonomous-agent sandbox for portfolio demos.">
+  <title>Agent Dispatch Floor</title>
+  <meta name="description" content="A browser-based autonomous-agent dispatch floor showing bots observe, choose, hand off, and deliver work.">
   <style>
     :root {
-      --bg: #09110f;
-      --panel: rgba(16, 30, 27, 0.82);
-      --panel-strong: rgba(20, 42, 37, 0.95);
-      --paper: #f7f0d2;
-      --ink: #f7f4df;
-      --muted: #aebcad;
-      --line: rgba(215, 229, 192, 0.18);
-      --amber: #f7c95f;
-      --mint: #7ef0b2;
-      --aqua: #59c7e8;
-      --coral: #ff796b;
-      --violet: #bda4ff;
-      --shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+      --bg: #07080a;
+      --ink: #f6f3e8;
+      --muted: #9aa4b4;
+      --dim: #5f6878;
+      --line: rgba(255, 255, 255, 0.1);
+      --panel: rgba(13, 16, 24, 0.84);
+      --panel-strong: rgba(16, 20, 31, 0.96);
+      --blue: #4a9eff;
+      --green: #3fd68f;
+      --gold: #e8a838;
+      --red: #f05050;
+      --violet: #a78bfa;
+      --cyan: #65e9ff;
       --radius: 28px;
       color-scheme: dark;
-      font-family: "Trebuchet MS", "Avenir Next", Verdana, sans-serif;
+      font-family: "IBM Plex Sans", "Segoe UI", Verdana, sans-serif;
     }
 
     * {
@@ -34,9 +34,10 @@
       margin: 0;
       color: var(--ink);
       background:
-        radial-gradient(circle at 12% 10%, rgba(126, 240, 178, 0.23), transparent 30%),
-        radial-gradient(circle at 86% 12%, rgba(247, 201, 95, 0.22), transparent 28%),
-        linear-gradient(135deg, #07100e 0%, #11231f 48%, #201b14 100%);
+        radial-gradient(circle at 15% 12%, rgba(74, 158, 255, 0.2), transparent 28%),
+        radial-gradient(circle at 82% 8%, rgba(232, 168, 56, 0.17), transparent 26%),
+        radial-gradient(circle at 70% 92%, rgba(167, 139, 250, 0.2), transparent 30%),
+        linear-gradient(135deg, #07080a 0%, #0c1020 48%, #101416 100%);
       overflow-x: hidden;
     }
 
@@ -46,9 +47,9 @@
       inset: 0;
       pointer-events: none;
       background-image:
-        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-      background-size: 42px 42px;
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 34px 34px;
       mask-image: radial-gradient(circle at center, black, transparent 78%);
     }
 
@@ -57,11 +58,15 @@
       font: inherit;
     }
 
+    button {
+      cursor: pointer;
+    }
+
     .shell {
       position: relative;
-      width: min(1480px, calc(100% - 32px));
+      width: min(1500px, calc(100% - 28px));
       margin: 0 auto;
-      padding: 26px 0 34px;
+      padding: 24px 0 34px;
     }
 
     .hero {
@@ -69,65 +74,67 @@
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 24px;
       align-items: end;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--cyan);
+      font: 700 12px/1 "IBM Plex Mono", "Consolas", monospace;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
     }
 
     h1 {
-      max-width: 900px;
+      max-width: 920px;
       margin: 0;
       font-family: Georgia, "Times New Roman", serif;
-      font-size: clamp(3rem, 7vw, 7.8rem);
-      line-height: 0.9;
-      letter-spacing: -0.075em;
-      text-wrap: balance;
+      font-size: clamp(3rem, 6vw, 6.8rem);
+      line-height: 0.86;
+      letter-spacing: -0.085em;
     }
 
     .intro {
       max-width: 720px;
-      margin: 18px 0 0;
-      color: var(--muted);
-      font-size: clamp(1rem, 1.6vw, 1.22rem);
-      line-height: 1.6;
+      margin: 22px 0 0;
+      color: #c9d0d7;
+      font-size: clamp(1rem, 2vw, 1.28rem);
+      line-height: 1.7;
     }
 
-    .status-strip {
+    .metrics {
       display: grid;
-      grid-template-columns: repeat(3, minmax(120px, 1fr));
+      grid-template-columns: repeat(2, minmax(140px, 1fr));
       gap: 10px;
-      min-width: min(470px, 100%);
-      padding: 12px;
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      background: rgba(9, 17, 15, 0.66);
-      box-shadow: var(--shadow);
+      min-width: min(420px, 100%);
     }
 
     .metric {
+      border: 1px solid var(--line);
+      border-radius: 20px;
       padding: 14px 16px;
-      border-radius: 18px;
-      background: rgba(247, 240, 210, 0.08);
+      background: rgba(255, 255, 255, 0.045);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
     }
 
     .metric span {
       display: block;
+      margin-bottom: 6px;
       color: var(--muted);
-      font-size: 0.72rem;
-      letter-spacing: 0.13em;
+      font: 700 10px/1 "IBM Plex Mono", "Consolas", monospace;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
     }
 
     .metric strong {
       display: block;
-      margin-top: 8px;
-      color: var(--paper);
-      font-size: 1.5rem;
-      line-height: 1;
+      font-size: 1.08rem;
     }
 
     .dashboard {
       display: grid;
-      grid-template-columns: 290px minmax(0, 1fr) 350px;
-      gap: 18px;
+      grid-template-columns: 270px minmax(0, 1fr) 360px;
+      gap: 16px;
       align-items: stretch;
     }
 
@@ -135,37 +142,39 @@
       border: 1px solid var(--line);
       border-radius: var(--radius);
       background: var(--panel);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(20px);
+      box-shadow: 0 26px 90px rgba(0, 0, 0, 0.36);
       overflow: hidden;
+      backdrop-filter: blur(18px);
     }
 
     .panel-header {
       display: flex;
       justify-content: space-between;
-      gap: 12px;
+      gap: 14px;
       align-items: center;
-      padding: 18px 20px;
+      padding: 16px 18px;
       border-bottom: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(247, 240, 210, 0.08), transparent);
+      background: rgba(255, 255, 255, 0.035);
     }
 
     .panel-title {
       margin: 0;
-      font-size: 0.82rem;
-      letter-spacing: 0.15em;
+      font: 800 13px/1.2 "IBM Plex Mono", "Consolas", monospace;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
     }
 
     .hint {
       color: var(--muted);
-      font-size: 0.82rem;
+      font: 700 10px/1 "IBM Plex Mono", "Consolas", monospace;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
     }
 
     .controls {
       display: grid;
       gap: 18px;
-      padding: 18px;
+      padding: 16px;
     }
 
     .button-row,
@@ -179,41 +188,32 @@
     }
 
     .btn {
-      min-height: 44px;
-      padding: 10px 14px;
-      border: 1px solid var(--line);
+      border: 1px solid rgba(255, 255, 255, 0.13);
       border-radius: 16px;
+      padding: 12px 14px;
       color: var(--ink);
-      background: rgba(247, 240, 210, 0.09);
-      cursor: pointer;
-      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+      background: rgba(255, 255, 255, 0.06);
+      text-align: left;
+      transition: border-color 0.18s, background 0.18s, transform 0.18s;
     }
 
     .btn:hover,
-    .btn:focus-visible {
+    .btn.active {
+      border-color: rgba(101, 233, 255, 0.5);
+      background: rgba(101, 233, 255, 0.11);
       transform: translateY(-1px);
-      border-color: rgba(126, 240, 178, 0.55);
-      outline: none;
-      background: rgba(126, 240, 178, 0.13);
     }
 
     .btn.primary {
-      color: #10211c;
-      border-color: transparent;
-      background: linear-gradient(135deg, var(--mint), var(--amber));
-      font-weight: 800;
+      border-color: rgba(63, 214, 143, 0.5);
+      background: rgba(63, 214, 143, 0.14);
     }
 
-    .scenario-grid .btn {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      text-align: left;
-    }
-
-    .scenario-grid .btn.active {
-      border-color: rgba(247, 201, 95, 0.8);
-      background: rgba(247, 201, 95, 0.16);
+    .btn span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 0.78rem;
     }
 
     .slider-group {
@@ -225,25 +225,22 @@
       display: flex;
       justify-content: space-between;
       margin-bottom: 9px;
-      color: var(--muted);
+      color: #d8dfe4;
       font-size: 0.86rem;
     }
 
     input[type="range"] {
       width: 100%;
-      accent-color: var(--mint);
+      accent-color: var(--cyan);
     }
 
     .toggle {
       display: flex;
-      align-items: center;
       justify-content: space-between;
       gap: 16px;
-      padding: 13px 14px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: rgba(247, 240, 210, 0.06);
-      color: var(--muted);
+      align-items: center;
+      color: #d8dfe4;
+      font-size: 0.9rem;
     }
 
     .switch {
@@ -254,7 +251,6 @@
     }
 
     .switch input {
-      position: absolute;
       opacity: 0;
     }
 
@@ -262,199 +258,235 @@
       position: absolute;
       inset: 0;
       border-radius: 999px;
-      background: rgba(247, 240, 210, 0.18);
-      transition: background 160ms ease;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.08);
     }
 
     .track::after {
       content: "";
       position: absolute;
-      width: 22px;
-      height: 22px;
-      top: 3px;
+      width: 20px;
+      height: 20px;
       left: 3px;
+      top: 3px;
       border-radius: 50%;
-      background: var(--paper);
-      transition: transform 160ms ease;
-    }
-
-    .switch input:checked + .track {
-      background: rgba(126, 240, 178, 0.62);
+      background: #d8dfe4;
+      transition: transform 0.2s, background 0.2s;
     }
 
     .switch input:checked + .track::after {
       transform: translateX(24px);
+      background: var(--green);
     }
 
-    .sim-wrap {
-      display: grid;
-      grid-template-rows: auto minmax(430px, 1fr) auto;
-      min-height: 710px;
+    .floor-panel {
+      min-height: 700px;
     }
 
-    .canvas-frame {
+    .floor-wrap {
       position: relative;
-      margin: 18px;
-      border: 1px solid rgba(247, 240, 210, 0.26);
-      border-radius: 30px;
-      background:
-        radial-gradient(circle at 20% 20%, rgba(126, 240, 178, 0.22), transparent 22%),
-        radial-gradient(circle at 82% 25%, rgba(255, 121, 107, 0.18), transparent 18%),
-        radial-gradient(circle at 60% 78%, rgba(89, 199, 232, 0.16), transparent 20%),
-        #0b1815;
+      height: min(70vh, 760px);
+      min-height: 610px;
+      margin: 16px;
       overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(101, 233, 255, 0.09), transparent 35%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 32%),
+        #07080a;
     }
 
     canvas {
       display: block;
       width: 100%;
       height: 100%;
-      min-height: 430px;
     }
 
-    .board-caption {
+    .floor-caption {
       position: absolute;
       left: 18px;
+      right: 18px;
       bottom: 18px;
-      max-width: min(520px, calc(100% - 36px));
+      margin: 0;
       padding: 12px 14px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: rgba(7, 16, 14, 0.78);
-      color: var(--muted);
-      font-size: 0.9rem;
-      line-height: 1.45;
-    }
-
-    .legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      padding: 0 18px 18px;
-    }
-
-    .legend-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 10px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      color: var(--muted);
-      background: rgba(247, 240, 210, 0.06);
-      font-size: 0.8rem;
-    }
-
-    .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      color: #d4d9df;
+      background: rgba(0, 0, 0, 0.48);
+      backdrop-filter: blur(14px);
+      font-size: 0.92rem;
+      line-height: 1.55;
     }
 
     .right-column {
       display: grid;
-      grid-template-rows: 1fr 320px;
-      gap: 18px;
-      min-height: 710px;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .inspector {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .active-agent {
+      display: grid;
+      grid-template-columns: 58px 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .sprite-mini {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .active-agent h3 {
+      margin: 0 0 5px;
+      font-size: 1.05rem;
+    }
+
+    .active-agent p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.45;
+    }
+
+    .decision-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .decision-row {
+      display: grid;
+      gap: 6px;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.045);
+    }
+
+    .decision-row b {
+      color: #ffffff;
+      font-size: 0.85rem;
+    }
+
+    .decision-row span {
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .score-bars {
+      display: grid;
+      gap: 8px;
+    }
+
+    .score {
+      display: grid;
+      grid-template-columns: 88px 1fr 32px;
+      gap: 8px;
+      align-items: center;
+      color: #c9d0d7;
+      font-size: 0.78rem;
+    }
+
+    .score-track {
+      height: 7px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .score-track i {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--cyan);
     }
 
     .agents {
       display: grid;
-      gap: 12px;
+      gap: 10px;
       padding: 16px;
-      max-height: 370px;
-      overflow: auto;
     }
 
     .agent-card {
       display: grid;
       grid-template-columns: auto 1fr;
-      gap: 12px;
-      padding: 14px;
+      gap: 11px;
+      align-items: center;
+      padding: 11px;
       border: 1px solid var(--line);
-      border-radius: 20px;
-      background: rgba(247, 240, 210, 0.07);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.045);
     }
 
-    .avatar {
-      width: 42px;
-      height: 42px;
-      display: grid;
-      place-items: center;
-      border-radius: 16px;
-      color: #07100e;
-      font-weight: 900;
+    .agent-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      box-shadow: 0 0 18px currentColor;
     }
 
     .agent-card h3 {
       display: flex;
-      align-items: center;
       justify-content: space-between;
       gap: 10px;
-      margin: 0 0 7px;
-      font-size: 1rem;
+      margin: 0 0 6px;
+      font-size: 0.92rem;
     }
 
-    .behavior {
-      color: var(--amber);
-      font-size: 0.72rem;
-      letter-spacing: 0.12em;
+    .agent-card h3 span {
+      color: var(--muted);
+      font: 700 0.68rem/1 "IBM Plex Mono", "Consolas", monospace;
       text-transform: uppercase;
     }
 
-    .mini-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      color: var(--muted);
-      font-size: 0.82rem;
-    }
-
-    .bar {
-      grid-column: 1 / -1;
-      height: 8px;
-      border-radius: 999px;
-      background: rgba(247, 240, 210, 0.12);
-      overflow: hidden;
-    }
-
-    .bar span {
-      display: block;
-      height: 100%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, var(--coral), var(--amber), var(--mint));
+    .agent-card p {
+      margin: 0;
+      color: #aeb7c4;
+      font-size: 0.78rem;
+      line-height: 1.45;
     }
 
     .log {
       display: flex;
       flex-direction: column-reverse;
       gap: 9px;
-      height: 262px;
-      padding: 15px;
-      overflow: auto;
+      max-height: 250px;
+      overflow: hidden;
+      padding: 16px;
     }
 
     .log-entry {
       padding: 11px 12px;
-      border-left: 3px solid var(--aqua);
-      border-radius: 12px;
-      background: rgba(247, 240, 210, 0.065);
-      color: var(--muted);
-      font-size: 0.84rem;
-      line-height: 1.35;
+      border-left: 3px solid var(--cyan);
+      border-radius: 14px;
+      color: #cfd6de;
+      background: rgba(255, 255, 255, 0.045);
+      font-size: 0.82rem;
+      line-height: 1.45;
     }
 
     .log-entry strong {
-      color: var(--ink);
+      color: #fff;
     }
 
     .footer-note {
-      margin: 20px auto 0;
-      max-width: 880px;
-      color: rgba(247, 244, 223, 0.68);
-      font-size: 0.92rem;
+      margin: 20px 2px 0;
+      color: var(--muted);
+      font-size: 0.9rem;
       line-height: 1.6;
-      text-align: center;
     }
 
     @media (max-width: 1180px) {
@@ -463,52 +495,41 @@
         grid-template-columns: 1fr;
       }
 
-      .right-column {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto;
-        min-height: 0;
+      .metrics {
+        grid-template-columns: repeat(4, 1fr);
       }
 
-      .sim-wrap {
-        min-height: 620px;
+      .floor-wrap {
+        height: 660px;
       }
     }
 
-    @media (max-width: 760px) {
+    @media (max-width: 680px) {
       .shell {
-        width: min(100% - 22px, 1480px);
-        padding-top: 16px;
+        width: min(100% - 18px, 1500px);
+        padding-top: 14px;
       }
 
-      .status-strip,
-      .right-column {
-        grid-template-columns: 1fr;
+      h1 {
+        font-size: clamp(3.1rem, 18vw, 5rem);
       }
 
-      .button-row {
-        grid-template-columns: 1fr;
+      .metrics {
+        grid-template-columns: 1fr 1fr;
       }
 
-      .sim-wrap {
-        min-height: 560px;
+      .floor-wrap {
+        height: 540px;
+        min-height: 520px;
+        margin: 10px;
       }
 
-      .canvas-frame {
-        margin: 12px;
-      }
-
-      canvas {
-        min-height: 380px;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        scroll-behavior: auto !important;
-        transition-duration: 0.01ms !important;
-        animation-duration: 0.01ms !important;
+      .panel-header,
+      .controls,
+      .inspector,
+      .agents,
+      .log {
+        padding: 13px;
       }
     }
   </style>
@@ -517,21 +538,23 @@
   <main class="shell">
     <section class="hero" aria-labelledby="page-title">
       <div>
-        <h1 id="page-title">Agent Playground</h1>
-        <p class="intro">A visual sandbox where tiny autonomous agents try different strategies, react to changing conditions, and leave a readable trail of decisions.</p>
+        <p class="eyebrow">Autonomous behavior lab</p>
+        <h1 id="page-title">Agent Dispatch Floor</h1>
+        <p class="intro">A live operations floor where small bots pick jobs, pass packets, route around problems, and explain why they changed plans.</p>
       </div>
-      <div class="status-strip" aria-label="Simulation metrics">
+      <div class="metrics" aria-label="Simulation metrics">
         <div class="metric"><span>Mode</span><strong id="modeMetric">Running</strong></div>
-        <div class="metric"><span>Step</span><strong id="stepMetric">0</strong></div>
-        <div class="metric"><span>Scenario</span><strong id="scenarioMetric">Harvest</strong></div>
+        <div class="metric"><span>Cycle</span><strong id="cycleMetric">0</strong></div>
+        <div class="metric"><span>Scenario</span><strong id="scenarioMetric">Content Ingest</strong></div>
+        <div class="metric"><span>Delivered</span><strong id="deliveredMetric">0</strong></div>
       </div>
     </section>
 
-    <section class="dashboard" aria-label="Agent simulation controls and output">
+    <section class="dashboard" aria-label="Agent dispatch floor controls and simulation">
       <aside class="panel">
         <div class="panel-header">
           <h2 class="panel-title">Control Room</h2>
-          <span class="hint">demo knobs</span>
+          <span class="hint">scenarios</span>
         </div>
         <div class="controls">
           <div class="button-row">
@@ -539,373 +562,471 @@
             <button class="btn" id="reset" type="button">Reset</button>
           </div>
 
-          <div>
-            <h3 class="panel-title">Scenarios</h3>
-            <div class="scenario-grid" id="scenarioButtons">
-              <button class="btn active" type="button" data-scenario="harvest">Resource Rush <span>gather</span></button>
-              <button class="btn" type="button" data-scenario="market">Trade Bazaar <span>trade</span></button>
-              <button class="btn" type="button" data-scenario="storm">Energy Storm <span>flee</span></button>
-              <button class="btn" type="button" data-scenario="team">Co-op Quest <span>cooperate</span></button>
-            </div>
+          <div class="scenario-grid" id="scenarioButtons">
+            <button class="btn active" type="button" data-scenario="ingest">Content Ingest <span>many raw items</span></button>
+            <button class="btn" type="button" data-scenario="outage">System Outage <span>triage and recovery</span></button>
+            <button class="btn" type="button" data-scenario="market">Market Watch <span>fast signals</span></button>
+            <button class="btn" type="button" data-scenario="research">Research Sprint <span>deep handoffs</span></button>
           </div>
 
           <div class="slider-group" aria-label="Strategy sliders">
             <label>
-              <span class="slider-label"><span>Curiosity</span><strong id="curiosityValue">68</strong></span>
-              <input id="curiosity" type="range" min="0" max="100" value="68">
+              <span class="slider-label"><span>Autonomy</span><strong id="autonomyValue">72</strong></span>
+              <input id="autonomy" type="range" min="0" max="100" value="72">
             </label>
             <label>
-              <span class="slider-label"><span>Risk Appetite</span><strong id="riskValue">42</strong></span>
-              <input id="risk" type="range" min="0" max="100" value="42">
+              <span class="slider-label"><span>Risk tolerance</span><strong id="riskValue">38</strong></span>
+              <input id="risk" type="range" min="0" max="100" value="38">
             </label>
             <label>
-              <span class="slider-label"><span>Team Bias</span><strong id="teamValue">55</strong></span>
-              <input id="teamBias" type="range" min="0" max="100" value="55">
+              <span class="slider-label"><span>Collaboration</span><strong id="collabValue">66</strong></span>
+              <input id="collab" type="range" min="0" max="100" value="66">
             </label>
           </div>
 
           <label class="toggle">
-            <span>Show intent trails</span>
-            <span class="switch">
-              <input id="trails" type="checkbox" checked>
-              <span class="track"></span>
-            </span>
+            <span>Show intent beams</span>
+            <span class="switch"><input id="beams" type="checkbox" checked><span class="track"></span></span>
           </label>
           <label class="toggle">
-            <span>Competitive scoring</span>
-            <span class="switch">
-              <input id="competition" type="checkbox" checked>
-              <span class="track"></span>
-            </span>
+            <span>Show packet traffic</span>
+            <span class="switch"><input id="packets" type="checkbox" checked><span class="track"></span></span>
           </label>
         </div>
       </aside>
 
-      <section class="panel sim-wrap">
+      <section class="panel floor-panel">
         <div class="panel-header">
-          <h2 class="panel-title">Sandbox Board</h2>
-          <span class="hint" id="boardHint">Agents are choosing actions every few seconds.</span>
+          <h2 class="panel-title">Operations Floor</h2>
+          <span class="hint" id="floorHint">bots dispatch work every few seconds</span>
         </div>
-        <div class="canvas-frame">
-          <canvas id="board" width="980" height="620" aria-label="Animated simulation board"></canvas>
-          <p class="board-caption" id="caption">Each agent scores nearby resources, other agents, hazards, and energy level. The highest-scoring behavior becomes the next move.</p>
-        </div>
-        <div class="legend" aria-label="Board legend">
-          <span class="legend-item"><span class="dot" style="background: var(--mint)"></span>Resources</span>
-          <span class="legend-item"><span class="dot" style="background: var(--coral)"></span>Hazards</span>
-          <span class="legend-item"><span class="dot" style="background: var(--amber)"></span>Recharge pads</span>
-          <span class="legend-item"><span class="dot" style="background: var(--aqua)"></span>Agent path</span>
+        <div class="floor-wrap">
+          <canvas id="floor" width="1120" height="720" aria-label="Animated agent dispatch floor"></canvas>
+          <p class="floor-caption" id="caption">Bots observe queue pressure, station health, distance, energy, and nearby peers. The highest-scoring action becomes the next visible move.</p>
         </div>
       </section>
 
       <aside class="right-column">
         <section class="panel">
           <div class="panel-header">
-            <h2 class="panel-title">Agent Cards</h2>
-            <span class="hint">live status</span>
+            <h2 class="panel-title">Decision Inspector</h2>
+            <span class="hint">latest choice</span>
+          </div>
+          <div class="inspector" id="inspector"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Agent Roster</h2>
+            <span class="hint">live roles</span>
           </div>
           <div class="agents" id="agentCards"></div>
         </section>
 
         <section class="panel">
           <div class="panel-header">
-            <h2 class="panel-title">Behavior Timeline</h2>
-            <span class="hint">plain-English log</span>
+            <h2 class="panel-title">Event Log</h2>
+            <span class="hint">plain English</span>
           </div>
           <div class="log" id="log"></div>
         </section>
       </aside>
     </section>
 
-    <p class="footer-note">Built as a static portfolio experiment: simple enough to understand at a glance, interactive enough to show how autonomous behavior can emerge from local rules.</p>
+    <p class="footer-note">This is a static browser experiment. The point is not perfect intelligence; it is making an agent loop visible: observe, score, choose, move, hand off, and report.</p>
   </main>
 
   <script>
-    const canvas = document.querySelector("#board");
+    const canvas = document.querySelector("#floor");
     const ctx = canvas.getContext("2d");
     const cards = document.querySelector("#agentCards");
     const logEl = document.querySelector("#log");
+    const inspector = document.querySelector("#inspector");
     const toggleRun = document.querySelector("#toggleRun");
     const resetBtn = document.querySelector("#reset");
     const scenarioMetric = document.querySelector("#scenarioMetric");
+    const cycleMetric = document.querySelector("#cycleMetric");
+    const deliveredMetric = document.querySelector("#deliveredMetric");
     const modeMetric = document.querySelector("#modeMetric");
-    const stepMetric = document.querySelector("#stepMetric");
     const caption = document.querySelector("#caption");
-    const scenarioButtons = document.querySelector("#scenarioButtons");
-    const trailsToggle = document.querySelector("#trails");
-    const competitionToggle = document.querySelector("#competition");
+    const floorHint = document.querySelector("#floorHint");
     const sliders = {
-      curiosity: document.querySelector("#curiosity"),
+      autonomy: document.querySelector("#autonomy"),
       risk: document.querySelector("#risk"),
-      teamBias: document.querySelector("#teamBias")
+      collab: document.querySelector("#collab")
     };
     const sliderOutputs = {
-      curiosity: document.querySelector("#curiosityValue"),
+      autonomy: document.querySelector("#autonomyValue"),
       risk: document.querySelector("#riskValue"),
-      teamBias: document.querySelector("#teamValue")
+      collab: document.querySelector("#collabValue")
     };
+    const beamsToggle = document.querySelector("#beams");
+    const packetsToggle = document.querySelector("#packets");
 
-    const scenarioCopy = {
-      harvest: {
-        label: "Harvest",
-        caption: "Resources are plentiful. Agents mostly gather, explore, and occasionally compete over the richest clusters."
-      },
-      market: {
-        label: "Market",
-        caption: "Trade beacons are more valuable. Agents look for partners, swap points, and follow high-performing neighbors."
-      },
-      storm: {
-        label: "Storm",
-        caption: "Hazards drift through the sandbox. Agents with low risk tolerance flee sooner and recharge more often."
-      },
-      team: {
-        label: "Co-op",
-        caption: "Team rewards are boosted. Agents score cooperation higher when a nearby partner is chasing the same goal."
-      }
+    const colors = {
+      Collector: "#4a9eff",
+      Diplomat: "#3fd68f",
+      Opportunist: "#e8a838",
+      Predator: "#f05050",
+      Survivor: "#a78bfa"
     };
 
     const behaviorColors = {
-      gather: "#7ef0b2",
-      explore: "#59c7e8",
-      trade: "#f7c95f",
-      follow: "#bda4ff",
-      flee: "#ff796b",
-      recharge: "#ffeaa0",
-      cooperate: "#8ff7df",
-      compete: "#ff9f74"
+      scan: "#65e9ff",
+      fetch: "#4a9eff",
+      delegate: "#3fd68f",
+      exploit: "#e8a838",
+      guard: "#f05050",
+      recover: "#a78bfa",
+      deliver: "#f6f3e8"
     };
 
-    const names = ["Milo", "Nova", "Pip", "Jun", "Echo", "Zed"];
-    const colors = ["#7ef0b2", "#59c7e8", "#f7c95f", "#ff796b", "#bda4ff", "#8ff7df"];
+    const scenarioCopy = {
+      ingest: {
+        label: "Content Ingest",
+        pressure: 0.72,
+        incident: 0.12,
+        prize: 0.36,
+        caption: "Raw files are entering the inbox. Agents split work across extraction, memory, tools, and publishing.",
+        hint: "content packets are flowing into the floor"
+      },
+      outage: {
+        label: "System Outage",
+        pressure: 0.42,
+        incident: 0.92,
+        prize: 0.24,
+        caption: "A service is unstable. Agents guard critical stations, recover failing tasks, and reroute packets away from trouble.",
+        hint: "incident response is active"
+      },
+      market: {
+        label: "Market Watch",
+        pressure: 0.62,
+        incident: 0.34,
+        prize: 0.88,
+        caption: "Signals are moving quickly. Opportunistic bots chase high-value packets while cautious bots verify and deliver summaries.",
+        hint: "fast signals create priority conflicts"
+      },
+      research: {
+        label: "Research Sprint",
+        pressure: 0.52,
+        incident: 0.18,
+        prize: 0.54,
+        caption: "A deeper task requires coordination. Agents trade context, pass drafts, and consolidate findings into output.",
+        hint: "handoffs and memory writes are emphasized"
+      }
+    };
+
+    const stations = [
+      { id: "inbox", label: "Inbox", x: 120, y: 124, color: "#65e9ff" },
+      { id: "research", label: "Research", x: 394, y: 112, color: "#4a9eff" },
+      { id: "tools", label: "Tools", x: 740, y: 126, color: "#e8a838" },
+      { id: "memory", label: "Memory", x: 250, y: 448, color: "#a78bfa" },
+      { id: "review", label: "Review", x: 596, y: 476, color: "#3fd68f" },
+      { id: "output", label: "Output", x: 970, y: 420, color: "#f6f3e8" },
+      { id: "recharge", label: "Recharge", x: 880, y: 612, color: "#f05050" }
+    ];
+
+    const agentDefs = [
+      { name: "Collector", role: "finds and carries raw work", home: "inbox", draw: drawCollector },
+      { name: "Diplomat", role: "hands off and coordinates", home: "review", draw: drawDiplomat },
+      { name: "Opportunist", role: "chases high-value openings", home: "tools", draw: drawOpportunist },
+      { name: "Predator", role: "guards incidents and bottlenecks", home: "research", draw: drawPredator },
+      { name: "Survivor", role: "recovers when energy is low", home: "recharge", draw: drawSurvivor }
+    ];
+
     let agents = [];
-    let resources = [];
-    let hazards = [];
-    let pads = [];
+    let packets = [];
+    let signals = [];
     let running = true;
-    let scenario = "harvest";
-    let step = 0;
+    let scenario = "ingest";
+    let delivered = 0;
+    let cycle = 0;
+    let t = 0;
     let lastDecisionAt = 0;
     let lastFrameAt = performance.now();
+    let latestDecision = null;
+
+    function station(id) {
+      return stations.find((item) => item.id === id);
+    }
 
     function rand(min, max) {
-      return min + Math.random() * (max - min);
+      return Math.random() * (max - min) + min;
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
     }
 
     function distance(a, b) {
       return Math.hypot(a.x - b.x, a.y - b.y);
     }
 
-    function nearest(origin, list) {
-      return list.reduce((best, item) => {
-        const d = distance(origin, item);
-        return d < best.d ? { item, d } : best;
-      }, { item: null, d: Infinity });
+    function weights() {
+      return {
+        autonomy: Number(sliders.autonomy.value) / 100,
+        risk: Number(sliders.risk.value) / 100,
+        collab: Number(sliders.collab.value) / 100
+      };
     }
 
-    function createAgents() {
-      agents = names.map((name, index) => ({
-        name,
-        x: rand(80, canvas.width - 80),
-        y: rand(80, canvas.height - 80),
-        vx: rand(-0.35, 0.35),
-        vy: rand(-0.35, 0.35),
-        color: colors[index],
-        behavior: "explore",
-        energy: rand(62, 96),
-        score: 0,
-        mood: "curious",
-        target: null,
-        trail: []
-      }));
-    }
-
-    function createWorld() {
-      const resourceCount = scenario === "harvest" ? 28 : scenario === "storm" ? 14 : 20;
-      const hazardCount = scenario === "storm" ? 9 : 5;
-      resources = Array.from({ length: resourceCount }, () => ({
-        x: rand(40, canvas.width - 40),
-        y: rand(40, canvas.height - 40),
-        value: rand(6, 18)
-      }));
-      hazards = Array.from({ length: hazardCount }, () => ({
-        x: rand(60, canvas.width - 60),
-        y: rand(60, canvas.height - 60),
-        r: rand(18, 34),
-        drift: rand(0.2, 0.7)
-      }));
-      pads = Array.from({ length: 4 }, () => ({
-        x: rand(70, canvas.width - 70),
-        y: rand(70, canvas.height - 70)
-      }));
-    }
-
-    function log(message) {
+    function log(message, color = "#65e9ff") {
       const entry = document.createElement("div");
       entry.className = "log-entry";
+      entry.style.borderLeftColor = color;
       entry.innerHTML = message;
       logEl.prepend(entry);
-      while (logEl.children.length > 18) {
+      while (logEl.children.length > 14) {
         logEl.lastElementChild.remove();
       }
     }
 
-    function reset() {
-      step = 0;
-      logEl.innerHTML = "";
-      createAgents();
-      createWorld();
-      log("<strong>Reset:</strong> new sandbox seeded with fresh resources, hazards, and starting positions.");
-      renderCards();
+    function createAgents() {
+      agents = agentDefs.map((def, index) => {
+        const home = station(def.home);
+        return {
+          ...def,
+          x: home.x + rand(-26, 26),
+          y: home.y + rand(-24, 24),
+          target: home,
+          behavior: "scan",
+          previousBehavior: "scan",
+          energy: rand(72, 100),
+          completed: 0,
+          packet: null,
+          thought: "Scanning floor",
+          scores: {},
+          route: [],
+          phase: index * 1.3
+        };
+      });
     }
 
-    function weights() {
-      return {
-        curiosity: Number(sliders.curiosity.value) / 100,
-        risk: Number(sliders.risk.value) / 100,
-        team: Number(sliders.teamBias.value) / 100
-      };
+    function spawnPacket(kind = "raw") {
+      const source = station("inbox");
+      const options = scenario === "outage"
+        ? ["research", "tools", "review", "output"]
+        : scenario === "research"
+          ? ["research", "memory", "review", "output"]
+          : scenario === "market"
+            ? ["tools", "review", "output"]
+            : ["research", "memory", "review", "output"];
+      const targetId = options[Math.floor(Math.random() * options.length)];
+      packets.push({
+        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()),
+        kind,
+        x: source.x + rand(-28, 28),
+        y: source.y + rand(-20, 20),
+        target: station(targetId),
+        value: Math.round(rand(8, 26) * (scenario === "market" ? 1.4 : 1)),
+        carriedBy: null,
+        pulse: rand(0, 10),
+        color: scenario === "outage" ? "#f05050" : scenario === "market" ? "#e8a838" : "#65e9ff"
+      });
+    }
+
+    function reset() {
+      delivered = 0;
+      cycle = 0;
+      t = 0;
+      lastDecisionAt = 0;
+      logEl.innerHTML = "";
+      packets = [];
+      signals = [];
+      createAgents();
+      for (let i = 0; i < 9; i += 1) {
+        spawnPacket(i % 3 === 0 ? "priority" : "raw");
+      }
+      latestDecision = null;
+      log("<strong>Reset:</strong> dispatch floor seeded with agents, packets, and station pressure.");
+      agents.forEach(chooseBehavior);
+      renderCards();
+      renderInspector();
+    }
+
+    function nearestPacket(agent) {
+      const loose = packets.filter((packet) => !packet.carriedBy);
+      if (!loose.length) return { item: null, d: Infinity };
+      return loose
+        .map((packet) => ({ item: packet, d: distance(agent, packet) }))
+        .sort((a, b) => a.d - b.d)[0];
+    }
+
+    function nearestAgent(agent) {
+      return agents
+        .filter((other) => other !== agent)
+        .map((other) => ({ item: other, d: distance(agent, other) }))
+        .sort((a, b) => a.d - b.d)[0];
+    }
+
+    function troubledStation() {
+      if (scenario !== "outage") return null;
+      return station(cycle % 2 === 0 ? "tools" : "research");
     }
 
     function chooseBehavior(agent) {
       const w = weights();
-      const closestResource = nearest(agent, resources);
-      const closestHazard = nearest(agent, hazards);
-      const closestPad = nearest(agent, pads);
-      const closestAgent = nearest(agent, agents.filter((other) => other !== agent));
-      const lowEnergy = Math.max(0, 1 - agent.energy / 58);
-      const danger = closestHazard.d < 120 ? (120 - closestHazard.d) / 120 : 0;
-      const scarcity = resources.length < 12 ? 0.32 : 0;
+      const scene = scenarioCopy[scenario];
+      if (!scene) return;
+      const packet = nearestPacket(agent);
+      const peer = nearestAgent(agent);
+      const outage = troubledStation();
+      const lowEnergy = Math.max(0, 1 - agent.energy / 55);
+      const carrying = agent.packet ? 1 : 0;
+      const packetPressure = clamp(packets.length / 14, 0, 1);
+      const peerReady = peer?.item && peer.d < 170 ? 1 : 0;
+      const outageDistance = outage ? 1 - Math.min(distance(agent, outage), 520) / 520 : 0;
 
       const scores = {
-        gather: (closestResource.item ? 1 - Math.min(closestResource.d, 360) / 360 : 0) + (scenario === "harvest" ? 0.28 : 0),
-        explore: w.curiosity + Math.random() * 0.18,
-        trade: scenario === "market" ? 0.85 : 0.18 + (agent.score > 25 ? 0.16 : 0),
-        follow: closestAgent.d < 180 ? 0.35 + w.team * 0.45 : 0.14,
-        flee: danger * (1.15 - w.risk) + (scenario === "storm" ? 0.18 : 0),
-        recharge: lowEnergy + (closestPad.d < 140 ? 0.22 : 0),
-        cooperate: w.team + (scenario === "team" ? 0.42 : 0) + (closestAgent.d < 170 ? 0.2 : 0),
-        compete: competitionToggle.checked ? w.risk + scarcity + (scenario === "harvest" ? 0.16 : 0) : 0
+        scan: 0.24 + w.autonomy * 0.36 + Math.random() * 0.08,
+        fetch: packet.item ? 0.26 + packetPressure * 0.45 + (1 - Math.min(packet.d, 440) / 440) * 0.32 : 0,
+        delegate: 0.16 + w.collab * 0.55 + peerReady * 0.24 + (agent.name === "Diplomat" ? 0.26 : 0),
+        exploit: scene.prize * 0.72 + w.risk * 0.32 + (agent.name === "Opportunist" ? 0.32 : 0),
+        guard: scene.incident * 0.7 + outageDistance * 0.3 + (agent.name === "Predator" ? 0.34 : 0),
+        recover: lowEnergy + (agent.name === "Survivor" ? 0.22 : 0),
+        deliver: carrying ? 0.92 : 0.08
       };
 
-      const behavior = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
-      if (behavior !== agent.behavior) {
-        log(`<strong>${agent.name}</strong> switched from ${agent.behavior} to <strong>${behavior}</strong> after comparing energy, nearby objects, and scenario pressure.`);
+      if (agent.packet && distance(agent, agent.packet.target) < 78) {
+        scores.deliver += 0.4;
       }
-      agent.behavior = behavior;
-      agent.mood = behavior === "flee" ? "alert" : behavior === "recharge" ? "tired" : behavior === "cooperate" ? "helpful" : behavior === "compete" ? "bold" : "curious";
+      if (agent.energy < 30) {
+        scores.recover += 0.45;
+      }
 
-      if (behavior === "gather" || behavior === "compete") agent.target = closestResource.item;
-      else if (behavior === "recharge") agent.target = closestPad.item;
-      else if (behavior === "follow" || behavior === "trade" || behavior === "cooperate") agent.target = closestAgent.item;
-      else if (behavior === "flee") agent.target = closestHazard.item;
-      else agent.target = { x: rand(40, canvas.width - 40), y: rand(40, canvas.height - 40) };
+      const ranked = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+      const next = ranked[0][0];
+      const old = agent.behavior;
+
+      agent.previousBehavior = old;
+      agent.behavior = next;
+      agent.scores = scores;
+
+      if (next === "fetch" && packet.item) {
+        agent.target = packet.item;
+        agent.thought = `Queue pressure ${Math.round(packetPressure * 100)}%; nearest packet is worth ${packet.item.value}.`;
+      } else if (next === "deliver" && agent.packet) {
+        agent.target = agent.packet.target;
+        agent.thought = `Carrying ${agent.packet.kind}; finish the route before scanning again.`;
+      } else if (next === "delegate" && peer?.item) {
+        agent.target = peer.item;
+        agent.thought = `Collaboration is high; hand context to ${peer.item.name}.`;
+      } else if (next === "guard" && outage) {
+        agent.target = outage;
+        agent.thought = `${outage.label} is unstable; move there and reduce incident risk.`;
+      } else if (next === "recover") {
+        agent.target = station("recharge");
+        agent.thought = `Energy ${Math.round(agent.energy)}%; recover before taking more work.`;
+      } else if (next === "exploit") {
+        agent.target = station(scenario === "market" ? "tools" : "output");
+        agent.thought = `High-value opening detected; push a fast path to output.`;
+      } else {
+        agent.target = stations[Math.floor(Math.random() * stations.length)];
+        agent.thought = `No dominant task; patrol for new signals.`;
+      }
+
+      latestDecision = {
+        agent,
+        observed: `packets ${packets.length}, energy ${Math.round(agent.energy)}%, peer ${peer?.item?.name || "none"}, scenario ${scenarioCopy[scenario].label}`,
+        choice: next,
+        result: agent.thought,
+        scores: ranked.slice(0, 5)
+      };
+
+      if (old !== next) {
+        log(`<strong>${agent.name}</strong> switched from ${old} to <strong>${next}</strong>: ${agent.thought}`, colors[agent.name]);
+      }
     }
 
     function steer(agent, dt) {
       const speedByBehavior = {
-        gather: 0.18,
-        explore: 0.13,
-        trade: 0.15,
-        follow: 0.17,
-        flee: 0.28,
-        recharge: 0.16,
-        cooperate: 0.16,
-        compete: 0.23
+        scan: 0.055,
+        fetch: 0.12,
+        delegate: 0.105,
+        exploit: 0.14,
+        guard: 0.12,
+        recover: 0.095,
+        deliver: 0.15
       };
-      const speed = speedByBehavior[agent.behavior] || 0.15;
-      let tx = agent.target?.x ?? agent.x;
-      let ty = agent.target?.y ?? agent.y;
+      const speed = speedByBehavior[agent.behavior] || 0.09;
+      const target = agent.target || station(agent.home);
+      const angle = Math.atan2(target.y - agent.y, target.x - agent.x);
+      agent.x += Math.cos(angle) * speed * dt;
+      agent.y += Math.sin(angle) * speed * dt;
+      agent.x += Math.sin(t * 1.1 + agent.phase) * 0.08 * dt;
+      agent.y += Math.cos(t * 0.9 + agent.phase) * 0.05 * dt;
+      agent.x = clamp(agent.x, 42, canvas.width - 42);
+      agent.y = clamp(agent.y, 42, canvas.height - 42);
+      agent.energy = clamp(agent.energy - (agent.behavior === "exploit" || agent.behavior === "guard" ? 0.032 : 0.018) * dt, 0, 100);
 
-      if (agent.behavior === "flee" && agent.target) {
-        tx = agent.x + (agent.x - agent.target.x);
-        ty = agent.y + (agent.y - agent.target.y);
+      if (agent.behavior === "recover" && distance(agent, station("recharge")) < 74) {
+        agent.energy = clamp(agent.energy + 0.18 * dt, 0, 100);
       }
-
-      const angle = Math.atan2(ty - agent.y, tx - agent.x);
-      agent.vx += Math.cos(angle) * speed * dt;
-      agent.vy += Math.sin(angle) * speed * dt;
-      agent.vx *= 0.9;
-      agent.vy *= 0.9;
-      agent.x += agent.vx;
-      agent.y += agent.vy;
-
-      if (agent.x < 20 || agent.x > canvas.width - 20) agent.vx *= -1;
-      if (agent.y < 20 || agent.y > canvas.height - 20) agent.vy *= -1;
-      agent.x = Math.max(20, Math.min(canvas.width - 20, agent.x));
-      agent.y = Math.max(20, Math.min(canvas.height - 20, agent.y));
-      agent.energy = Math.max(0, Math.min(100, agent.energy - (agent.behavior === "flee" || agent.behavior === "compete" ? 0.035 : 0.018) * dt));
-
-      agent.trail.push({ x: agent.x, y: agent.y });
-      if (agent.trail.length > 42) agent.trail.shift();
     }
 
     function resolveInteractions(agent) {
-      resources = resources.filter((resource) => {
-        if (distance(agent, resource) < 20 && ["gather", "compete"].includes(agent.behavior)) {
-          agent.score += Math.round(resource.value * (agent.behavior === "compete" ? 1.2 : 1));
-          agent.energy = Math.min(100, agent.energy + 6);
-          log(`<strong>${agent.name}</strong> collected a resource while trying to ${agent.behavior}.`);
-          return false;
+      if (!agent.packet) {
+        const packet = nearestPacket(agent);
+        if (packet.item && distance(agent, packet.item) < 34 && ["fetch", "exploit", "scan"].includes(agent.behavior)) {
+          agent.packet = packet.item;
+          packet.item.carriedBy = agent.name;
+          signals.push({ from: packet.item, to: agent, color: colors[agent.name], life: 50 });
+          log(`<strong>${agent.name}</strong> picked up a ${packet.item.kind} packet for ${packet.item.target.label}.`, colors[agent.name]);
         }
-        return true;
-      });
+      }
 
-      pads.forEach((pad) => {
-        if (distance(agent, pad) < 28 && agent.behavior === "recharge") {
-          agent.energy = Math.min(100, agent.energy + 1.2);
+      if (agent.packet) {
+        agent.packet.x = agent.x;
+        agent.packet.y = agent.y - 30;
+        if (distance(agent, agent.packet.target) < 52) {
+          delivered += 1;
+          agent.completed += 1;
+          agent.energy = clamp(agent.energy + 12, 0, 100);
+          signals.push({ from: agent, to: agent.packet.target, color: agent.packet.color, life: 70 });
+          log(`<strong>${agent.name}</strong> delivered ${agent.packet.kind} work to <strong>${agent.packet.target.label}</strong>.`, colors[agent.name]);
+          packets = packets.filter((packet) => packet !== agent.packet);
+          agent.packet = null;
+          agent.target = station(agent.home);
         }
-      });
+      }
 
-      hazards.forEach((hazard) => {
-        if (distance(agent, hazard) < hazard.r + 9) {
-          agent.energy = Math.max(0, agent.energy - 1.3);
-          if (agent.behavior !== "flee") {
-            agent.behavior = "flee";
-            agent.target = hazard;
-            log(`<strong>${agent.name}</strong> bumped into a hazard and immediately changed to <strong>flee</strong>.`);
-          }
-        }
-      });
-
-      agents.forEach((other) => {
-        if (other === agent || distance(agent, other) > 26) return;
-        if (agent.behavior === "cooperate") {
-          agent.score += 0.08;
-          other.score += 0.04;
-        }
-        if (agent.behavior === "trade") {
-          agent.energy = Math.min(100, agent.energy + 0.18);
-          other.energy = Math.min(100, other.energy + 0.08);
-        }
-      });
-
-      if (resources.length < 8) {
-        resources.push({ x: rand(40, canvas.width - 40), y: rand(40, canvas.height - 40), value: rand(6, 18) });
+      const peer = nearestAgent(agent);
+      if (peer?.item && peer.d < 42 && agent.behavior === "delegate") {
+        signals.push({ from: agent, to: peer.item, color: "#3fd68f", life: 44 });
+        agent.energy = clamp(agent.energy + 0.04, 0, 100);
+        peer.item.energy = clamp(peer.item.energy + 0.06, 0, 100);
       }
     }
 
     function updateWorld(dt) {
-      hazards.forEach((hazard, index) => {
-        hazard.x += Math.cos(step / 22 + index) * hazard.drift * dt * 0.08;
-        hazard.y += Math.sin(step / 25 + index * 2) * hazard.drift * dt * 0.08;
-        hazard.x = Math.max(35, Math.min(canvas.width - 35, hazard.x));
-        hazard.y = Math.max(35, Math.min(canvas.height - 35, hazard.y));
+      const desiredPackets = scenario === "ingest" ? 12 : scenario === "market" ? 10 : scenario === "outage" ? 7 : 9;
+      if (packets.length < desiredPackets && Math.random() < 0.035 * (dt / 16)) {
+        spawnPacket(scenario === "market" ? "signal" : scenario === "outage" ? "alert" : "raw");
+      }
+      packets.forEach((packet) => {
+        packet.pulse += 0.08 * dt;
+        if (!packet.carriedBy) {
+          packet.x += Math.sin(packet.pulse * 0.06) * 0.05 * dt;
+          packet.y += Math.cos(packet.pulse * 0.05) * 0.04 * dt;
+        }
       });
+      signals = signals.map((signal) => ({ ...signal, life: signal.life - dt * 0.08 })).filter((signal) => signal.life > 0);
     }
 
     function drawGrid() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#07080a";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.save();
-      ctx.globalAlpha = 0.26;
-      ctx.strokeStyle = "rgba(247,240,210,0.13)";
+      ctx.strokeStyle = "rgba(255,255,255,0.035)";
       ctx.lineWidth = 1;
-      for (let x = 0; x <= canvas.width; x += 48) {
+      for (let x = 0; x < canvas.width; x += 40) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
         ctx.lineTo(x, canvas.height);
         ctx.stroke();
       }
-      for (let y = 0; y <= canvas.height; y += 48) {
+      for (let y = 0; y < canvas.height; y += 40) {
         ctx.beginPath();
         ctx.moveTo(0, y);
         ctx.lineTo(canvas.width, y);
@@ -914,138 +1035,351 @@
       ctx.restore();
     }
 
+    function drawStation(item) {
+      const outage = troubledStation();
+      const unstable = outage && outage.id === item.id;
+      ctx.save();
+      ctx.translate(item.x, item.y);
+      ctx.shadowBlur = unstable ? 24 : 14;
+      ctx.shadowColor = unstable ? "#f05050" : item.color;
+      ctx.fillStyle = unstable ? "rgba(240,80,80,0.17)" : "rgba(255,255,255,0.055)";
+      ctx.strokeStyle = unstable ? "#f05050" : item.color;
+      ctx.lineWidth = unstable ? 2.4 : 1.4;
+      roundRect(ctx, -58, -28, 116, 56, 18);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.stroke();
+      ctx.fillStyle = item.color;
+      ctx.font = "800 11px IBM Plex Mono, Consolas, monospace";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(item.label.toUpperCase(), 0, 1);
+      if (unstable) {
+        ctx.fillStyle = "#f05050";
+        ctx.fillText("INCIDENT", 0, 40);
+      }
+      ctx.restore();
+    }
+
+    function roundRect(context, x, y, width, height, radius) {
+      context.beginPath();
+      context.moveTo(x + radius, y);
+      context.arcTo(x + width, y, x + width, y + height, radius);
+      context.arcTo(x + width, y + height, x, y + height, radius);
+      context.arcTo(x, y + height, x, y, radius);
+      context.arcTo(x, y, x + width, y, radius);
+      context.closePath();
+    }
+
+    function drawPacket(packet) {
+      if (packet.carriedBy && !packetsToggle.checked) return;
+      if (!packet.carriedBy && !packetsToggle.checked) return;
+      ctx.save();
+      ctx.translate(packet.x, packet.y);
+      ctx.shadowBlur = 14;
+      ctx.shadowColor = packet.color;
+      ctx.fillStyle = packet.color;
+      ctx.globalAlpha = packet.carriedBy ? 0.95 : 0.74;
+      ctx.beginPath();
+      ctx.rect(-8, -6, 16, 12);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = "rgba(255,255,255,0.65)";
+      ctx.strokeRect(-8, -6, 16, 12);
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = "#fff";
+      ctx.font = "700 9px IBM Plex Mono, Consolas, monospace";
+      ctx.textAlign = "center";
+      ctx.fillText(packet.value, 0, -13);
+      ctx.restore();
+    }
+
+    function drawSignal(signal) {
+      const from = signal.from;
+      const to = signal.to;
+      ctx.save();
+      ctx.globalAlpha = clamp(signal.life / 70, 0, 1);
+      ctx.strokeStyle = signal.color;
+      ctx.lineWidth = 2;
+      ctx.setLineDash([7, 10]);
+      ctx.beginPath();
+      ctx.moveTo(from.x, from.y);
+      ctx.lineTo(to.x, to.y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+    }
+
+    function drawThought(agent) {
+      ctx.save();
+      ctx.translate(agent.x, agent.y - 54);
+      const label = agent.behavior.toUpperCase();
+      ctx.fillStyle = "rgba(0,0,0,0.62)";
+      ctx.strokeStyle = behaviorColors[agent.behavior] || colors[agent.name];
+      ctx.lineWidth = 1;
+      roundRect(ctx, -42, -16, 84, 24, 12);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "#fff";
+      ctx.font = "800 9px IBM Plex Mono, Consolas, monospace";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(label, 0, -3);
+      ctx.restore();
+    }
+
+    function drawAgent(agent) {
+      if (beamsToggle.checked && agent.target) {
+        ctx.save();
+        ctx.strokeStyle = `${behaviorColors[agent.behavior] || colors[agent.name]}66`;
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 9]);
+        ctx.beginPath();
+        ctx.moveTo(agent.x, agent.y);
+        ctx.lineTo(agent.target.x, agent.target.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.restore();
+      }
+
+      agent.draw(ctx, agent.x, agent.y, 18, t + agent.phase);
+      drawThought(agent);
+    }
+
     function draw() {
       drawGrid();
-
-      resources.forEach((resource) => {
-        ctx.fillStyle = "#7ef0b2";
-        ctx.beginPath();
-        ctx.arc(resource.x, resource.y, 5 + resource.value / 5, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      pads.forEach((pad) => {
-        ctx.strokeStyle = "#f7c95f";
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.arc(pad.x, pad.y, 22, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.fillStyle = "rgba(247,201,95,0.16)";
-        ctx.fill();
-      });
-
-      hazards.forEach((hazard) => {
-        ctx.fillStyle = "rgba(255,121,107,0.16)";
-        ctx.strokeStyle = "#ff796b";
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(hazard.x, hazard.y, hazard.r, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-      });
-
-      agents.forEach((agent) => {
-        if (trailsToggle.checked) {
-          ctx.strokeStyle = behaviorColors[agent.behavior] + "88";
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          agent.trail.forEach((point, index) => {
-            if (index === 0) ctx.moveTo(point.x, point.y);
-            else ctx.lineTo(point.x, point.y);
-          });
-          ctx.stroke();
-        }
-
-        if (agent.target) {
-          ctx.strokeStyle = behaviorColors[agent.behavior] + "55";
-          ctx.setLineDash([5, 9]);
-          ctx.beginPath();
-          ctx.moveTo(agent.x, agent.y);
-          ctx.lineTo(agent.target.x, agent.target.y);
-          ctx.stroke();
-          ctx.setLineDash([]);
-        }
-
-        ctx.fillStyle = agent.color;
-        ctx.shadowColor = agent.color;
-        ctx.shadowBlur = 16;
-        ctx.beginPath();
-        ctx.arc(agent.x, agent.y, 13, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = "#07100e";
-        ctx.font = "900 10px Trebuchet MS";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(agent.name[0], agent.x, agent.y + 1);
-        ctx.fillStyle = behaviorColors[agent.behavior];
-        ctx.font = "700 11px Trebuchet MS";
-        ctx.fillText(agent.behavior, agent.x, agent.y - 22);
-      });
+      stations.forEach(drawStation);
+      signals.forEach(drawSignal);
+      packets.forEach(drawPacket);
+      agents.forEach(drawAgent);
     }
 
     function renderCards() {
       cards.innerHTML = agents.map((agent) => `
         <article class="agent-card">
-          <div class="avatar" style="background:${agent.color}">${agent.name[0]}</div>
+          <div class="agent-dot" style="color:${colors[agent.name]}; background:${colors[agent.name]}"></div>
           <div>
-            <h3>${agent.name}<span class="behavior">${agent.behavior}</span></h3>
-            <div class="mini-stats">
-              <span>Energy ${Math.round(agent.energy)}%</span>
-              <span>Score ${Math.floor(agent.score)}</span>
-              <span>Mood ${agent.mood}</span>
-              <span>Goal ${agent.target ? "locked" : "scanning"}</span>
-              <span class="bar"><span style="width:${Math.round(agent.energy)}%"></span></span>
-            </div>
+            <h3>${agent.name}<span>${agent.behavior}</span></h3>
+            <p>${agent.role}. Energy ${Math.round(agent.energy)}%. Delivered ${agent.completed}.</p>
           </div>
         </article>
       `).join("");
     }
 
-    function tick(now) {
-      const dt = Math.min(40, now - lastFrameAt);
-      lastFrameAt = now;
+    function renderInspector() {
+      const decision = latestDecision || {
+        agent: agents[0],
+        observed: "waiting for first decision cycle",
+        choice: "scan",
+        result: "Agents are initializing their station map.",
+        scores: [["scan", 1], ["fetch", 0], ["delegate", 0]]
+      };
+      if (!decision?.agent) return;
+      inspector.innerHTML = `
+        <div class="active-agent">
+          <canvas class="sprite-mini" width="58" height="58" data-agent="${decision.agent.name}"></canvas>
+          <div>
+            <h3>${decision.agent.name}</h3>
+            <p>${decision.agent.role}</p>
+          </div>
+        </div>
+        <div class="decision-list">
+          <div class="decision-row"><b>Observed</b><span>${decision.observed}</span></div>
+          <div class="decision-row"><b>Chosen Action</b><span>${decision.choice}</span></div>
+          <div class="decision-row"><b>Why</b><span>${decision.result}</span></div>
+        </div>
+        <div class="score-bars">
+          ${decision.scores.map(([name, value]) => `
+            <div class="score">
+              <span>${name}</span>
+              <span class="score-track"><i style="width:${Math.round(clamp(value, 0, 1.4) / 1.4 * 100)}%; background:${behaviorColors[name] || "#65e9ff"}"></i></span>
+              <span>${value.toFixed(2)}</span>
+            </div>
+          `).join("")}
+        </div>
+      `;
+      const mini = inspector.querySelector("canvas");
+      const miniCtx = mini.getContext("2d");
+      miniCtx.clearRect(0, 0, 58, 58);
+      decision.agent.draw(miniCtx, 29, 30, 12, t + decision.agent.phase);
+    }
 
+    function loop(now) {
+      const dt = Math.min(38, now - lastFrameAt);
+      lastFrameAt = now;
       if (running) {
-        step += 1;
+        t += dt / 1000;
+        cycle += dt / 250;
         updateWorld(dt);
-        if (now - lastDecisionAt > 1450) {
+        if (now - lastDecisionAt > 1650) {
           agents.forEach(chooseBehavior);
           lastDecisionAt = now;
           renderCards();
+          renderInspector();
         }
         agents.forEach((agent) => {
           steer(agent, dt);
           resolveInteractions(agent);
         });
-        stepMetric.textContent = String(Math.floor(step / 10));
-        if (step % 16 === 0) renderCards();
       }
-
+      cycleMetric.textContent = String(Math.floor(cycle));
+      deliveredMetric.textContent = String(delivered);
       draw();
-      requestAnimationFrame(tick);
+      requestAnimationFrame(loop);
+    }
+
+    function drawCollector(context, x, y, r, time) {
+      context.save(); context.translate(x, y);
+      context.save(); context.rotate(time * 0.8);
+      context.strokeStyle = "rgba(74,158,255,0.35)"; context.lineWidth = 1;
+      context.setLineDash([4, 4]);
+      context.beginPath(); context.arc(0, 0, r * 1.6, 0, Math.PI * 2); context.stroke();
+      context.setLineDash([]);
+      context.fillStyle = "#4a9eff";
+      context.beginPath(); context.arc(r * 1.6, 0, 2.5, 0, Math.PI * 2); context.fill();
+      context.restore();
+      context.shadowBlur = 14; context.shadowColor = "#4a9eff";
+      context.fillStyle = "#1a3a5c";
+      context.beginPath(); context.arc(0, 0, r, 0, Math.PI * 2); context.fill();
+      context.shadowBlur = 0;
+      context.strokeStyle = "#4a9eff"; context.lineWidth = 1.5;
+      context.beginPath(); context.arc(0, 0, r, 0, Math.PI * 2); context.stroke();
+      context.fillStyle = "#4a9eff";
+      context.beginPath(); context.arc(0, 0, r * 0.45, 0, Math.PI * 2); context.fill();
+      context.strokeStyle = "#4a9eff"; context.lineWidth = 1.2;
+      context.beginPath();
+      context.moveTo(-r * 0.4, -r); context.lineTo(-r * 0.55, -r * 1.55);
+      context.moveTo(r * 0.4, -r); context.lineTo(r * 0.55, -r * 1.55);
+      context.stroke();
+      context.fillStyle = "#4a9eff";
+      context.beginPath(); context.arc(-r * 0.55, -r * 1.55, 2, 0, Math.PI * 2); context.fill();
+      context.beginPath(); context.arc(r * 0.55, -r * 1.55, 2, 0, Math.PI * 2); context.fill();
+      context.restore();
+    }
+
+    function drawDiplomat(context, x, y, r, time) {
+      context.save(); context.translate(x, y);
+      const pulse = 1 + Math.sin(time * 1.2) * 0.08;
+      context.strokeStyle = "rgba(63,214,143,0.5)"; context.lineWidth = 1;
+      for (let i = 0; i < 5; i += 1) {
+        const angle = (i / 5) * Math.PI + 0.2;
+        const wave = Math.sin(time * 1.5 + i) * 4;
+        context.beginPath();
+        context.moveTo(Math.cos(angle + 0.3) * r * 0.7, r * 0.7);
+        context.quadraticCurveTo(Math.cos(angle) * r * 0.5 + wave, r * 1.3 + i * 3, Math.cos(angle) * r * 0.3 + wave * 1.5, r * 1.8 + i * 4);
+        context.stroke();
+      }
+      context.shadowBlur = 16; context.shadowColor = "#3fd68f";
+      context.fillStyle = "rgba(15,50,35,0.9)";
+      context.beginPath(); context.ellipse(0, 0, r * pulse, r * 0.75 * pulse, 0, Math.PI, 0); context.fill();
+      context.shadowBlur = 0;
+      context.strokeStyle = "#3fd68f"; context.lineWidth = 1.5;
+      context.beginPath(); context.ellipse(0, 0, r * pulse, r * 0.75 * pulse, 0, Math.PI, 0); context.stroke();
+      context.fillStyle = "rgba(63,214,143,0.25)";
+      context.beginPath(); context.ellipse(0, -r * 0.1, r * 0.6 * pulse, r * 0.45 * pulse, 0, Math.PI, 0); context.fill();
+      context.strokeStyle = "rgba(63,214,143,0.4)";
+      context.beginPath(); context.moveTo(-r * pulse, 0); context.lineTo(r * pulse, 0); context.stroke();
+      context.restore();
+    }
+
+    function drawOpportunist(context, x, y, r, time) {
+      context.save(); context.translate(x, y);
+      const eyeShift = Math.sin(time * 0.7) * r * 0.2;
+      context.shadowBlur = 12; context.shadowColor = "#e8a838";
+      context.fillStyle = "#2a1f05";
+      context.beginPath();
+      for (let i = 0; i < 6; i += 1) {
+        const a = i * Math.PI / 3 - Math.PI / 6;
+        if (i === 0) context.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+        else context.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+      }
+      context.closePath(); context.fill(); context.shadowBlur = 0;
+      context.strokeStyle = "#e8a838"; context.lineWidth = 1.5; context.stroke();
+      context.strokeStyle = "rgba(232,168,56,0.5)";
+      context.beginPath(); context.arc(0, r * 0.15, r * 0.4, 0.2, Math.PI - 0.2); context.stroke();
+      context.fillStyle = "#e8a838";
+      context.beginPath(); context.arc(-r * 0.3 + eyeShift, -r * 0.15, 2.5, 0, Math.PI * 2); context.fill();
+      context.beginPath(); context.arc(r * 0.3 + eyeShift, -r * 0.15, 2.5, 0, Math.PI * 2); context.fill();
+      context.strokeStyle = "rgba(232,168,56,0.3)";
+      for (let i = 0; i < 6; i += 1) {
+        const a = i * Math.PI / 3 - Math.PI / 6;
+        context.beginPath();
+        context.moveTo(Math.cos(a) * r * 0.72, Math.sin(a) * r * 0.72);
+        context.lineTo(Math.cos(a) * r * 0.55, Math.sin(a) * r * 0.55);
+        context.stroke();
+      }
+      context.restore();
+    }
+
+    function drawPredator(context, x, y, r, time) {
+      context.save(); context.translate(x, y); context.rotate(Math.sin(time * 1.8) * 0.12);
+      context.strokeStyle = "rgba(240,80,80,0.75)"; context.lineWidth = 1.3;
+      [-0.55, -1.15, 0.55, 1.15, Math.PI + 0.55, Math.PI + 1.15, Math.PI - 0.55, Math.PI - 1.15].forEach((a, i) => {
+        const wave = Math.sin(time * 2 + i * 0.8) * r * 0.18;
+        context.beginPath();
+        context.moveTo(Math.cos(a) * r * 0.7, Math.sin(a) * r * 0.7);
+        context.quadraticCurveTo(Math.cos(a) * r * 0.99 + wave * 0.3, Math.sin(a) * r * 0.99 + wave * 0.3, Math.cos(a) * r * 1.85 + wave, Math.sin(a) * r * 1.85 + wave);
+        context.stroke();
+      });
+      context.fillStyle = "#1a0505";
+      context.shadowBlur = 14; context.shadowColor = "#f05050";
+      context.beginPath(); context.ellipse(0, r * 0.3, r * 0.55, r * 0.75, 0, 0, Math.PI * 2); context.fill();
+      context.shadowBlur = 0; context.strokeStyle = "#f05050"; context.stroke();
+      context.shadowBlur = 8; context.shadowColor = "#f05050";
+      context.beginPath(); context.arc(0, -r * 0.2, r * 0.48, 0, Math.PI * 2); context.fill();
+      context.shadowBlur = 0; context.stroke();
+      context.fillStyle = "#f05050";
+      [[-0.28, -0.28], [0.28, -0.28], [-0.12, -0.38], [0.12, -0.38], [-0.4, -0.15], [0.4, -0.15], [-0.3, -0.08], [0.3, -0.08]].forEach(([ex, ey]) => {
+        context.beginPath(); context.arc(ex * r, (ey - 0.2) * r, 1.6, 0, Math.PI * 2); context.fill();
+      });
+      context.restore();
+    }
+
+    function drawSurvivor(context, x, y, r, time) {
+      context.save(); context.translate(x, y);
+      for (let i = 0; i < 6; i += 1) {
+        context.save();
+        context.rotate(i * Math.PI / 3 + time * 0.4);
+        context.globalAlpha = 0.6;
+        context.fillStyle = "#a78bfa";
+        context.beginPath(); context.moveTo(0, -r * 0.7); context.lineTo(r * 0.22, -r * 1.4); context.lineTo(-r * 0.22, -r * 1.4); context.closePath(); context.fill();
+        context.restore();
+      }
+      context.globalAlpha = 1;
+      context.shadowBlur = 18; context.shadowColor = "#a78bfa";
+      context.fillStyle = "#2d1f5e";
+      context.beginPath(); context.arc(0, 0, r * 0.7, 0, Math.PI * 2); context.fill();
+      context.shadowBlur = 0;
+      context.strokeStyle = "#a78bfa"; context.lineWidth = 1.5;
+      context.beginPath(); context.arc(0, 0, r * 0.7, 0, Math.PI * 2); context.stroke();
+      context.strokeStyle = "rgba(167,139,250,0.4)";
+      context.beginPath(); context.moveTo(0, -r * 0.6); context.lineTo(r * 0.5, r * 0.3); context.lineTo(-r * 0.5, r * 0.3); context.closePath(); context.stroke();
+      context.fillStyle = "#c4b0ff";
+      context.beginPath(); context.arc(0, 0, r * 0.22, 0, Math.PI * 2); context.fill();
+      context.restore();
     }
 
     toggleRun.addEventListener("click", () => {
       running = !running;
       toggleRun.textContent = running ? "Pause" : "Start";
       modeMetric.textContent = running ? "Running" : "Paused";
-      log(running ? "<strong>Started:</strong> agents resumed choosing and moving." : "<strong>Paused:</strong> current behavior state is frozen for inspection.");
+      log(running ? "<strong>Started:</strong> bots resumed dispatch decisions." : "<strong>Paused:</strong> floor state is frozen for inspection.");
     });
 
     resetBtn.addEventListener("click", reset);
 
-    scenarioButtons.addEventListener("click", (event) => {
-      const button = event.target.closest("button[data-scenario]");
+    document.querySelector("#scenarioButtons").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-scenario]");
       if (!button) return;
       scenario = button.dataset.scenario;
       document.querySelectorAll("[data-scenario]").forEach((item) => item.classList.toggle("active", item === button));
       scenarioMetric.textContent = scenarioCopy[scenario].label;
       caption.textContent = scenarioCopy[scenario].caption;
-      createWorld();
+      floorHint.textContent = scenarioCopy[scenario].hint;
       agents.forEach(chooseBehavior);
+      log(`<strong>Scenario:</strong> switched to ${scenarioCopy[scenario].label}; scores recalculated.`);
       renderCards();
-      log(`<strong>Scenario:</strong> switched to ${scenarioCopy[scenario].label}. Agent priorities were recalculated.`);
+      renderInspector();
     });
 
     Object.entries(sliders).forEach(([key, input]) => {
@@ -1053,17 +1387,15 @@
         sliderOutputs[key].textContent = input.value;
         agents.forEach(chooseBehavior);
         renderCards();
+        renderInspector();
       });
-    });
-
-    competitionToggle.addEventListener("change", () => {
-      agents.forEach(chooseBehavior);
-      log(`<strong>Competition:</strong> scoring is now ${competitionToggle.checked ? "enabled" : "softened"} for agent decisions.`);
     });
 
     reset();
     caption.textContent = scenarioCopy[scenario].caption;
-    requestAnimationFrame(tick);
+    floorHint.textContent = scenarioCopy[scenario].hint;
+    scenarioMetric.textContent = scenarioCopy[scenario].label;
+    requestAnimationFrame(loop);
   </script>
 </body>
 </html>

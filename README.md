@@ -6,38 +6,32 @@
   </a>
 </p>
 
-Agent Playground started from a simple question: what makes a bot look like it is thinking?
+Agent Playground is a browser-based dispatch floor for showing autonomous behavior.
 
-Instead of building another chat interface, this experiment turns that question into a small visual sandbox. Tiny agents move around a shared board, react to resources and hazards, choose behaviors, and leave behind a readable trail of decisions. The point is not to make the smartest possible agent. The point is to make the decision loop visible.
-
-Each agent has limited energy, a goal, and a simple personality. Sometimes it explores. Sometimes it gathers. Sometimes it follows another agent, trades, competes, recharges, or flees. Small rule changes can make the group feel calm, greedy, cooperative, or chaotic.
+The idea is simple: make agents visible. Five bots move between stations, pick up packets, hand work to each other, recover when energy is low, and explain why they changed plans. It is less like a game board and more like a small operations room where each bot has a job.
 
 ![Agent Playground screenshot](docs/assets/agent-playground-main.png)
 
-## Open It
+## What It Shows
 
-No install or build step is required.
+- Bots with distinct roles: Collector, Diplomat, Opportunist, Predator, and Survivor.
+- A dispatch floor with stations for Inbox, Research, Tools, Memory, Review, Output, and Recharge.
+- Packets moving through the system as work gets picked up, delegated, and delivered.
+- Scenario modes such as Content Ingest, System Outage, Market Watch, and Research Sprint.
+- A decision inspector that shows what an agent observed, how it scored options, what it chose, and why.
 
-1. Open `index.html` directly in a browser.
-2. Or serve the folder locally:
+## Why It Exists
+
+Autonomous agents are easier to understand when the decision loop is visible. This project turns observe -> score -> choose -> act -> report into something you can watch.
+
+The simulation is intentionally lightweight. It is a visual experiment for agent behavior, not a full planner or production workflow engine.
+
+## Run Locally
+
+No build step is required.
 
 ```powershell
 python -m http.server 8000
 ```
 
-Then visit `http://localhost:8000`.
-
-## What It Demonstrates
-
-- A canvas-based sandbox with simulated agents.
-- Agent status cards that show energy, mood, current behavior, and score.
-- Behavior choices such as gather, explore, trade, follow, flee, recharge, cooperate, and compete.
-- Scenario buttons that change the environment.
-- Strategy sliders and toggles that influence how agents decide what to do.
-- A visible timeline/log explaining important decisions in plain language.
-
-## Why It Exists
-
-Autonomous agents can sound abstract when they are described only in terms of prompts, tools, and planning loops. This project makes the idea easier to see. An agent observes its surroundings, updates its internal state, chooses an action, and affects the world around it.
-
-The sandbox is intentionally lightweight. It is a place to experiment with behavior, not a full game engine or a serious simulation. The interesting part is watching simple decision rules combine into something that starts to feel alive.
+Then open `http://localhost:8000`.
